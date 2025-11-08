@@ -1,0 +1,21 @@
+﻿ID,Station Départ,Station Arrivée,Distance (km),Type Revêtement,État Route,Nids-de-poule,Trafic Matin,Trafic Soir,Sécurité,Coût Carburant (FCFA),Péages (FCFA),Frais Informels (FCFA),Stationnement,Restrictions Horaires,Type de Véhicule,Fiabilité Temps,Praticabilité Pluie,Performance de type Véhicule
+1,Dépôt Central (Mvan),Dépôt Central,0.0,Bitumé,Bon,Aucun,Faible,Faible,Élevée,0,0,0,Excellent,Aucune,Tous,Très élevée,Excellente,50
+2,Dépôt Central (Mvan),Marché Mokolo,8.5,Bitumé,Moyen,Nombreux,Très dense,Très dense,Moyenne,2500,0,500,Très difficile,6h-10h seulement,Camionnette,Faible,Moyenne,40
+3,Dépôt Central (Mvan),Quartier Bastos,6.2,Bitumé,Bon,Quelques-uns,Dense,Très dense,Élevée,2000,0,0,Moyen,Aucune,Tous,Moyenne,Bonne,50
+4,Dépôt Central (Mvan),Marché Central,7.8,Bitumé,Moyen,Nombreux,Très dense,Très dense,Moyenne,2400,0,500,Très difficile,6h-11h seulement,Camionnette,Faible,Moyenne,40
+5,Dépôt Central (Mvan),Ngoa-Ekellé,4.5,Bitumé,Moyen,Nombreux,Dense,Dense,Moyenne,1500,0,300,Difficile,Aucune,Tous,Moyenne,Moyenne,50
+6,Dépôt Central (Mvan),Emombo,12.3,Terre/Latérite,Mauvais,Très nombreux,Moyen,Moyen,Faible,4000,0,1000,Limité,Éviter nuit,4x4,Très faible,Mauvaise,70
+7,Dépôt Central (Mvan),Essos,5.8,Bitumé,Moyen,Nombreux,Dense,Très dense,Moyenne,1800,0,300,Difficile,Aucune,Tous,Moyenne,Moyenne,60
+8,Dépôt Central (Mvan),Nlongkak,3.2,Bitumé,Bon,Quelques-uns,Dense,Dense,Élevée,1000,0,0,Moyen,Aucune,Tous,Élevée,Bonne,60
+9,Dépôt Central (Mvan),Mendong,9.7,Bitumé,Moyen,Nombreux,Moyen,Dense,Moyenne,3000,0,500,Limité,Aucune,Camion moyen,Moyenne,Moyenne,50
+10,Dépôt Central (Mvan),Biyem-Assi,11.2,Bitumé,Mauvais,Très nombreux,Dense,Très dense,Moyenne,3500,0,500,Difficile,Aucune,4x4 recommandé,Faible,Mauvaise,70
+11,Dépôt Central (Mvan),Mvog-Ada,6.8,Bitumé,Moyen,Nombreux,Dense,Dense,Moyenne,2100,0,300,Difficile,Aucune,Tous,Moyenne,Moyenne,50
+12,Dépôt Central (Mvan),Etoudi,8.9,Bitumé,Bon,Peu,Moyen,Dense,Élevée,2700,0,0,Moyen,Restrictions zone présidentielle,Tous,Moyenne,Bonne,50
+13,Dépôt Central (Mvan),Odza,10.5,Bitumé,Moyen,Nombreux,Dense,Très dense,Moyenne,3200,0,500,Limité,Aucune,Tous,Faible,Moyenne,50
+14,Dépôt Central (Mvan),Nkol-Eton,7.1,Bitumé,Bon,Quelques-uns,Dense,Dense,Élevée,2200,0,0,Moyen,Aucune,Tous,Élevée,Bonne,50
+15,Dépôt Central (Mvan),Nkomo,15.8,Terre/Bitumé mixte,Mauvais,Très nombreux,Faible,Moyen,Faible,5000,0,1500,Très limité,Éviter nuit,4x4,Très faible,Très mauvaise,70
+16,Dépôt Central (Mvan),Ekounou,13.4,Bitumé,Moyen,Nombreux,Moyen,Dense,Moyenne,4100,0,500,Limité,Aucune,Camion moyen,Moyenne,Moyenne,50
+17,Dépôt Central (Mvan),Kondengui,8.3,Bitumé,Moyen,Nombreux,Dense,Dense,Moyenne,2500,0,300,Difficile,Aucune,Tous,Moyenne,Moyenne,50
+18,Dépôt Central (Mvan),Mfoundi,4.9,Bitumé,Bon,Peu,Dense,Très dense,Élevée,1600,0,0,Moyen,Aucune,Tous,Élevée,Bonne,50
+19,Dépôt Central (Mvan),Santa Barbara,14.7,Terre/Latérite,Mauvais,Très nombreux,Faible,Faible,Faible,4800,0,1200,Très limité,Éviter nuit,4x4,Très faible,Très mauvaise,70
+20,Dépôt Central (Mvan),Omnisport,5.5,Bitumé,Bon,Peu,Dense,Très dense,Élevée,1700,0,0,Difficile,Jours matchs,Tous,Moyenne,Bonne,50
