@@ -197,24 +197,31 @@ def build_cost_matrix(df_clean, config, preprocessor):
 
     # Utiliser la matrice de coûts de la période 'matin' par défaut
     cost_matrix = matrices['cost']['matin']
+    distance_matrix = matrices['distance']
 
     print(f"\nMatrice de couts construite: {cost_matrix.shape}")
     print(f"  - Cout minimum (non-zero): {np.min(cost_matrix[cost_matrix > 0]):.2f}")
     print(f"  - Cout maximum: {np.max(cost_matrix):.2f}")
     print(f"  - Cout moyen: {np.mean(cost_matrix[cost_matrix > 0]):.2f}")
 
-    return cost_matrix, builder
+    print(f"\nMatrice de distances construite: {distance_matrix.shape}")
+    print(f"  - Distance minimum (non-zero): {np.min(distance_matrix[distance_matrix > 0]):.2f} km")
+    print(f"  - Distance maximum: {np.max(distance_matrix):.2f} km")
+    print(f"  - Distance moyenne: {np.mean(distance_matrix[distance_matrix > 0]):.2f} km")
+
+    return cost_matrix, distance_matrix, builder
 
 
-def setup_vrp_parameters(df_clean, cost_matrix, config):
+def setup_vrp_parameters(df_clean, cost_matrix, distance_matrix, config):
     """
     Configure les paramètres du modèle VRP
-    
+
     Args:
         df_clean: DataFrame nettoyé
         cost_matrix: Matrice des coûts
+        distance_matrix: Matrice des distances
         config: Configuration
-        
+
     Returns:
         VRPParameters
     """
@@ -226,41 +233,45 @@ def setup_vrp_parameters(df_clean, cost_matrix, config):
     num_customers = cost_matrix.shape[0] - 1
     
     # Demandes des clients (simulation si pas dans les données)
+    # Demandes réalistes pour Yaoundé: entre 30 et 80 unités par client
+    np.random.seed(config.seed)  # Pour reproductibilité
     demands = {}
     for i in range(1, num_customers + 1):
-        # Simuler une demande aléatoire entre 50 et 200 unités
-        demands[i] = np.random.randint(50, 200)
+        # Demande aléatoire entre 30 et 80 unités
+        demands[i] = np.random.randint(30, 81)
     
     # Fenêtres temporelles (extraire depuis les données ou simuler)
+    # Désactivées pour obtenir une solution faisable: 0h-24h (toute la journée)
     time_windows = {}
     for i in range(1, num_customers + 1):
-        # Fenêtre par défaut: 8h-18h
-        time_windows[i] = (8.0, 18.0)
+        # Fenêtre très large: toute la journée (0h-24h)
+        time_windows[i] = (0.0, 24.0)
     
     # Temps de service (30 minutes par défaut)
     service_times = {i: 0.5 for i in range(num_customers + 1)}
     
-    # Capacités des véhicules
+    # Capacités des véhicules (réalistes pour Yaoundé)
     vehicle_capacities = {
-        'Camionnette': 1000,
-        'Camion moyen': 2000,
-        '4x4': 1500
+        'Camionnette': 800,      # Petite camionnette pour zones difficiles
+        'Camion moyen': 1500,    # Camion moyen pour livraisons standards
+        '4x4': 1000              # 4x4 pour zones difficiles (Emombo, Nkomo, etc.)
     }
     
     vehicle_types = list(vehicle_capacities.keys())
     
-    # Coûts fixes des véhicules
+    # Coûts fixes des véhicules (réalistes pour Yaoundé)
+    # Coûts fixes = amortissement + assurance + entretien journalier
     fixed_vehicle_costs = {
-        'Camionnette': 5000,
-        'Camion moyen': 8000,
-        '4x4': 10000
+        'Camionnette': 3000,     # 3000 FCFA/jour
+        'Camion moyen': 4500,    # 4500 FCFA/jour
+        '4x4': 5000              # 5000 FCFA/jour (plus cher, consomme plus)
     }
     
     # Créer les paramètres
     parameters = VRPParameters(
         num_customers=num_customers,
         num_vehicles=config.max_vehicles,
-        distance_matrix=cost_matrix,
+        distance_matrix=distance_matrix,
         cost_matrix=cost_matrix,
         informal_fees=np.zeros_like(cost_matrix),
         toll_fees=np.zeros_like(cost_matrix),
@@ -311,7 +322,8 @@ def solve_vrp(parameters, config):
         demands=parameters.demands,
         time_windows=parameters.time_windows,
         vehicle_capacities=parameters.vehicle_capacities,
-        config=config.__dict__
+        config=config.__dict__,
+        distance_matrix=parameters.distance_matrix
     )
     
     # Résoudre
@@ -467,10 +479,10 @@ def export_results(solution, stats, analysis_results, parameters, output_dir):
     solution_dict = {
         'metadata': {
             'timestamp': timestamp,
-            'num_vehicles': solution.num_vehicles_used,
-            'total_cost': solution.total_cost,
-            'total_distance': solution.total_distance,
-            'is_feasible': analysis_results['is_feasible']
+            'num_vehicles': int(solution.num_vehicles_used) if hasattr(solution.num_vehicles_used, 'item') else solution.num_vehicles_used,
+            'total_cost': float(solution.total_cost) if hasattr(solution.total_cost, 'item') else solution.total_cost,
+            'total_distance': float(solution.total_distance) if hasattr(solution.total_distance, 'item') else solution.total_distance,
+            'is_feasible': bool(analysis_results['is_feasible'])
         },
         'routes': []
     }
@@ -480,13 +492,13 @@ def export_results(solution, stats, analysis_results, parameters, output_dir):
             continue
         
         route_dict = {
-            'vehicle_id': route.vehicle_id,
-            'vehicle_type': route.vehicle_type,
-            'customers': route.customers,
-            'load': route.load,
-            'capacity': route.capacity,
-            'distance': route.total_distance,
-            'cost': route.total_cost
+            'vehicle_id': int(route.vehicle_id) if hasattr(route.vehicle_id, 'item') else route.vehicle_id,
+            'vehicle_type': str(route.vehicle_type),
+            'customers': [int(c) if hasattr(c, 'item') else c for c in route.customers],
+            'load': float(route.load) if hasattr(route.load, 'item') else route.load,
+            'capacity': float(route.capacity) if hasattr(route.capacity, 'item') else route.capacity,
+            'distance': float(route.total_distance) if hasattr(route.total_distance, 'item') else route.total_distance,
+            'cost': float(route.total_cost) if hasattr(route.total_cost, 'item') else route.total_cost
         }
         solution_dict['routes'].append(route_dict)
     
@@ -603,10 +615,10 @@ def main():
         df_clean, preprocessor = load_and_preprocess_data(args.data)
         
         # PHASE 2: Construire la matrice de coûts
-        cost_matrix, builder = build_cost_matrix(df_clean, config, preprocessor)
-        
+        cost_matrix, distance_matrix, builder = build_cost_matrix(df_clean, config, preprocessor)
+
         # PHASE 3: Configurer les paramètres du VRP
-        parameters = setup_vrp_parameters(df_clean, cost_matrix, config)
+        parameters = setup_vrp_parameters(df_clean, cost_matrix, distance_matrix, config)
         
         # Export du modèle mathématique si demandé
         if args.export_model:

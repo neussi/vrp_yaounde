@@ -72,13 +72,14 @@ class Config:
         self.service_time = kwargs.get('service_time', 0.5)  # 30 minutes en heures
         
         # ===================================================================
-        # PENALITES
+        # PENALITES (Réalistes pour Yaoundé: 500-1500 FCFA)
+        # ATTENTION: Les pénalités de surcharge doivent être élevées pour forcer le respect des contraintes
         # ===================================================================
-        self.overload_penalty = kwargs.get('overload_penalty', 50000.0)  # FCFA par unité
-        self.late_penalty = kwargs.get('late_penalty', 10000.0)  # FCFA par heure
-        self.unassigned_penalty = kwargs.get('unassigned_penalty', 50000.0)  # FCFA par client
-        self.vehicle_incompatibility_penalty = kwargs.get('vehicle_incompatibility_penalty', 10000.0)
-        self.time_restriction_penalty = kwargs.get('time_restriction_penalty', 15000.0)
+        self.overload_penalty = kwargs.get('overload_penalty', 10000.0)  # 10000 FCFA par unité de surcharge (très dissuasif)
+        self.late_penalty = kwargs.get('late_penalty', 1000.0)  # 1000 FCFA par heure de retard
+        self.unassigned_penalty = kwargs.get('unassigned_penalty', 50000.0)  # 50k FCFA pour client non desservi (critique)
+        self.vehicle_incompatibility_penalty = kwargs.get('vehicle_incompatibility_penalty', 1000.0)  # 1000 FCFA
+        self.time_restriction_penalty = kwargs.get('time_restriction_penalty', 1500.0)  # 1500 FCFA
         
         # ===================================================================
         # PARAMETRES TEMPORELS

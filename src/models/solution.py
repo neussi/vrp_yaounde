@@ -77,39 +77,55 @@ class Solution:
             customers.extend(route.get_customers_only())
         return customers
     
-    def calculate_metrics(self, cost_matrix: np.ndarray, 
+    def calculate_metrics(self, cost_matrix: np.ndarray,
                          demands: Dict[int, float],
-                         config: Dict):
+                         config: Dict,
+                         distance_matrix: np.ndarray = None):
         """Calcule toutes les métriques de la solution"""
         self.total_cost = 0.0
         self.total_distance = 0.0
         self.total_time = 0.0
         self.num_vehicles_used = len([r for r in self.routes if not r.is_empty()])
-        
+
+        # Si pas de matrice de distances, utiliser cost_matrix (rétrocompatibilité)
+        if distance_matrix is None:
+            distance_matrix = cost_matrix
+
         for route in self.routes:
             if route.is_empty():
                 continue
-                
+
             # Calculer charge
             route.load = sum(demands.get(c, 0) for c in route.get_customers_only())
-            
-            # Calculer distance et coût
+
+            # Calculer distance et coût réels
             route_cost = 0.0
             route_distance = 0.0
-            
+
             for i in range(len(route.customers) - 1):
                 from_node = route.customers[i]
                 to_node = route.customers[i + 1]
-                
-                route_distance += cost_matrix[from_node, to_node]
+
+                # Distance en km
+                route_distance += distance_matrix[from_node, to_node]
+                # Coût en FCFA
                 route_cost += cost_matrix[from_node, to_node]
-            
+
+            # Ajouter coût fixe du véhicule
+            route_cost += config.get('fixed_vehicle_cost', 5000)
+
+            # Ajouter pénalités de surcharge si dépassement de capacité
+            if route.load > route.capacity:
+                overload = route.load - route.capacity
+                overload_penalty = config.get('overload_penalty', 5000.0)
+                route_cost += overload * overload_penalty
+
             route.total_distance = route_distance
-            route.total_cost = route_cost + config.get('fixed_vehicle_cost', 5000)
-            
+            route.total_cost = route_cost
+
             self.total_distance += route_distance
             self.total_cost += route.total_cost
-        
+
         # Pénalités pour clients non assignés
         self.total_cost += len(self.unassigned_customers) * config.get('unassigned_penalty', 50000)
         

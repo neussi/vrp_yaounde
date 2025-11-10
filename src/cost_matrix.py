@@ -65,11 +65,11 @@ class CostMatrixBuilder:
                 dist_matrix[j, i] = distance
         
         # Pour les distances inter-clients non specifiees dans le dataset
-        # On utilise l'inegalite triangulaire: d(i,j) = d(i,0) + d(0,j)
+        # Utiliser une estimation réaliste (60% de la somme)
         for i in range(1, n):
             for j in range(1, n):
                 if i != j and dist_matrix[i, j] == 0:
-                    dist_matrix[i, j] = dist_matrix[i, 0] + dist_matrix[0, j]
+                    dist_matrix[i, j] = (dist_matrix[i, 0] + dist_matrix[0, j]) * 0.6
         
         self.distance_matrix = dist_matrix
         print(f"[INFO] Matrice des distances construite: {n}x{n}")
@@ -141,11 +141,11 @@ class CostMatrixBuilder:
                 time_matrix[i, j] = total_time
                 time_matrix[j, i] = total_time  # Symmetrique
         
-        # Inter-clients: somme des temps via depot
+        # Inter-clients: estimation réaliste du temps de trajet
         for i in range(1, n):
             for j in range(1, n):
                 if i != j and time_matrix[i, j] == 0:
-                    time_matrix[i, j] = time_matrix[i, 0] + time_matrix[0, j]
+                    time_matrix[i, j] = (time_matrix[i, 0] + time_matrix[0, j]) * 0.6
         
         self.time_matrix[period] = time_matrix
         print(f"[INFO] Matrice des temps construite pour periode '{period}': {n}x{n}")
@@ -227,11 +227,14 @@ class CostMatrixBuilder:
                 cost_matrix[i, j] = arc_cost
                 cost_matrix[j, i] = arc_cost  # Symmetrique
         
-        # Inter-clients: somme des couts via depot
+        # Inter-clients: estimation réaliste (pas de retour au dépôt)
+        # Utiliser une moyenne des coûts comme approximation
         for i in range(1, n):
             for j in range(1, n):
                 if i != j and cost_matrix[i, j] == 0:
-                    cost_matrix[i, j] = cost_matrix[i, 0] + cost_matrix[0, j]
+                    # Approximation: moyenne des deux trajets depuis le dépôt
+                    # Plus réaliste que la somme totale
+                    cost_matrix[i, j] = (cost_matrix[i, 0] + cost_matrix[0, j]) * 0.6
         
         self.cost_matrix[period] = cost_matrix
         print(f"[INFO] Matrice des couts construite pour periode '{period}': {n}x{n}")

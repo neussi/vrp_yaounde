@@ -51,10 +51,12 @@ class ALNS:
                  demands: Dict[int, float],
                  time_windows: Dict[int, Tuple[float, float]],
                  vehicle_capacities: Dict[str, float],
-                 config: Dict):
-        
+                 config: Dict,
+                 distance_matrix: np.ndarray = None):
+
         # Données du problème
         self.cost_matrix = cost_matrix
+        self.distance_matrix = distance_matrix if distance_matrix is not None else cost_matrix
         self.demands = demands
         self.time_windows = time_windows
         self.vehicle_capacities = vehicle_capacities
@@ -185,7 +187,7 @@ class ALNS:
             
             # Recalculer toutes les métriques de la nouvelle solution
             new_solution.calculate_metrics(
-                self.cost_matrix, self.demands, self.config
+                self.cost_matrix, self.demands, self.config, self.distance_matrix
             )
             
             # --------------------------------------------------------------
@@ -285,7 +287,7 @@ class ALNS:
         initial_cost = best_solution.total_cost
         best_solution = self.local_search.two_opt(best_solution)
         best_solution.calculate_metrics(
-            self.cost_matrix, self.demands, self.config
+            self.cost_matrix, self.demands, self.config, self.distance_matrix
         )
         improvement = initial_cost - best_solution.total_cost
         
