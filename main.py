@@ -9,7 +9,7 @@ Ce script orchestre l'ensemble du processus:
 5. Export des solutions
 
 Utilisation:
-    python main.py --data data/trajets_yde.csv --iterations 5000 --output results/
+    python3 main.py --data data/trajets_yde.csv --iterations 5000 --output results/
 """
 
 import os
@@ -169,29 +169,40 @@ def load_and_preprocess_data(data_path):
     return df_clean, preprocessor
 
 
-def build_cost_matrix(df_clean, config):
+def build_cost_matrix(df_clean, config, preprocessor):
     """
     Construit la matrice de coûts
-    
+
     Args:
         df_clean: DataFrame nettoyé
         config: Configuration
-        
+        preprocessor: Instance du DataPreprocessor
+
     Returns:
         cost_matrix (numpy array)
     """
     print("\n" + "="*70)
     print("PHASE 2: CONSTRUCTION DE LA MATRICE DE COUTS")
     print("="*70)
-    
-    builder = CostMatrixBuilder(df_clean, config)
-    cost_matrix = builder.build_composite_cost_matrix()
-    
+
+    # Préparer les données au format attendu par CostMatrixBuilder
+    processed_data = {
+        'data': df_clean,
+        'station_map': preprocessor.station_mapping,
+        'n_stations': len(preprocessor.station_mapping) - 1  # Exclure le dépôt
+    }
+
+    builder = CostMatrixBuilder(processed_data)
+    matrices = builder.build_all_matrices()
+
+    # Utiliser la matrice de coûts de la période 'matin' par défaut
+    cost_matrix = matrices['cost']['matin']
+
     print(f"\nMatrice de couts construite: {cost_matrix.shape}")
     print(f"  - Cout minimum (non-zero): {np.min(cost_matrix[cost_matrix > 0]):.2f}")
     print(f"  - Cout maximum: {np.max(cost_matrix):.2f}")
     print(f"  - Cout moyen: {np.mean(cost_matrix[cost_matrix > 0]):.2f}")
-    
+
     return cost_matrix, builder
 
 
@@ -592,7 +603,7 @@ def main():
         df_clean, preprocessor = load_and_preprocess_data(args.data)
         
         # PHASE 2: Construire la matrice de coûts
-        cost_matrix, builder = build_cost_matrix(df_clean, config)
+        cost_matrix, builder = build_cost_matrix(df_clean, config, preprocessor)
         
         # PHASE 3: Configurer les paramètres du VRP
         parameters = setup_vrp_parameters(df_clean, cost_matrix, config)

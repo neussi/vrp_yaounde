@@ -206,7 +206,8 @@ class RepairOperators:
             
             # Choisir aléatoirement parmi les positions faisables
             if feasible_insertions:
-                route, pos = self.random_state.choice(feasible_insertions)
+                idx = self.random_state.randint(0, len(feasible_insertions))
+                route, pos = feasible_insertions[idx]
                 route.add_customer(customer, pos)
                 new_solution.unassigned_customers.remove(customer)
             else:
